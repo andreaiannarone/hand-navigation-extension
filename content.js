@@ -156,7 +156,7 @@
     if (!active) return;
 
     if (!p.present) {
-      setBadge('✋ nessuna mano');
+      setBadge(chrome.i18n.getMessage('badgeNoHand'));
       endScroll(); // release with inertia if we were scrolling
       return;
     }
@@ -164,7 +164,7 @@
     if (p.mode === 'scroll') {
       cursorEl.classList.remove('handnav-pinch');
       cursorEl.classList.add('handnav-scroll');
-      setBadge('↕︎ scroll');
+      setBadge(chrome.i18n.getMessage('badgeScroll'));
       applyScroll(p.y);
       return;
     }
@@ -192,13 +192,13 @@
 
     if (p.rightPinch) {
       cursorEl.classList.add('handnav-pinch');
-      setBadge('🖱 pinch destro');
+      setBadge(chrome.i18n.getMessage('badgePinchRight'));
     } else if (p.pinch) {
       cursorEl.classList.add('handnav-pinch');
-      setBadge('🤏 pinch');
+      setBadge(chrome.i18n.getMessage('badgePinch'));
     } else {
       cursorEl.classList.remove('handnav-pinch');
-      setBadge('☝︎ cursore');
+      setBadge(chrome.i18n.getMessage('badgeCursor'));
     }
 
     if (p.click) clickAt(posX, posY);
@@ -220,7 +220,7 @@
         scrollVel = 0;
         stopInertia();
         showUI(true);
-        setBadge('☝︎ pronto');
+        setBadge(chrome.i18n.getMessage('badgeReady'));
         break;
       case 'HIDE_OVERLAY':
         active = false;

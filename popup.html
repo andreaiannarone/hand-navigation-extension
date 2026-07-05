@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -12,56 +12,57 @@
       <span class="brand-dot"></span>
       <h1>Hand Navigation</h1>
     </div>
-    <p class="sub">Naviga con i gesti della mano</p>
+    <p class="sub" data-i18n="popupSubtitle">Naviga con i gesti della mano</p>
   </header>
 
-  <div id="status" class="status">Pronto.</div>
+  <div id="status" class="status" data-i18n="statusReady">Pronto.</div>
 
-  <button id="cameraBtn" class="btn btn-secondary">🎥 Consenti fotocamera</button>
-  <button id="toggleBtn" class="btn btn-primary">▶︎ Avvia</button>
+  <button id="cameraBtn" class="btn btn-secondary" data-i18n="allowCamera">🎥 Consenti fotocamera</button>
+  <button id="toggleBtn" class="btn btn-primary" data-i18n="startBtn">▶︎ Avvia</button>
 
   <details class="settings">
-    <summary>⚙︎ Sensibilità</summary>
+    <summary data-i18n="settingsTitle">⚙︎ Sensibilità</summary>
 
     <label>
-      Velocità cursore <output id="cursorGainOut"></output>
+      <span data-i18n="cursorSpeed">Velocità cursore</span> <output id="cursorGainOut"></output>
       <input type="range" id="cursorGain" min="1" max="3" step="0.1" />
     </label>
 
     <label>
-      Fluidità (smoothing) <output id="smoothingOut"></output>
+      <span data-i18n="smoothingLabel">Fluidità (smoothing)</span> <output id="smoothingOut"></output>
       <input type="range" id="smoothing" min="0" max="0.9" step="0.05" />
     </label>
 
     <label>
-      Velocità scroll <output id="scrollSpeedOut"></output>
+      <span data-i18n="scrollSpeedLabel">Velocità scroll</span> <output id="scrollSpeedOut"></output>
       <input type="range" id="scrollSpeed" min="0.5" max="3" step="0.1" />
     </label>
 
     <label>
-      Sensibilità pinch (click) <output id="pinchThresholdOut"></output>
+      <span data-i18n="pinchClick">Sensibilità pinch (click)</span> <output id="pinchThresholdOut"></output>
       <input type="range" id="pinchThreshold" min="0.2" max="0.5" step="0.02" />
     </label>
 
     <label>
-      Sensibilità pinch (tasto destro) <output id="rightPinchThresholdOut"></output>
+      <span data-i18n="pinchRight">Sensibilità pinch (tasto destro)</span> <output id="rightPinchThresholdOut"></output>
       <input type="range" id="rightPinchThreshold" min="0.2" max="0.5" step="0.02" />
     </label>
 
     <label class="checkbox">
       <input type="checkbox" id="invertScroll" />
-      Inverti direzione scroll
+      <span data-i18n="invertScrollLabel">Inverti direzione scroll</span>
     </label>
   </details>
 
   <div class="legend">
-    <div><span>☝︎</span> Indice = muovi il cursore</div>
-    <div><span>🤏</span> Pinch (pollice+indice) = click</div>
-    <div><span>🖱</span> Pinch (pollice+medio) = tasto destro</div>
-    <div><span>✋</span> Mano aperta = scroll (su/giù)</div>
-    <div><span>✊</span> Pugno = pausa</div>
+    <div><span>☝︎</span> <span data-i18n="legendCursor">Indice = muovi il cursore</span></div>
+    <div><span>🤏</span> <span data-i18n="legendClick">Pinch (pollice+indice) = click</span></div>
+    <div><span>🖱</span> <span data-i18n="legendRight">Pinch (pollice+medio) = tasto destro</span></div>
+    <div><span>✋</span> <span data-i18n="legendScroll">Mano aperta = scroll (su/giù)</span></div>
+    <div><span>✊</span> <span data-i18n="legendPause">Pugno = pausa</span></div>
   </div>
 
+  <script src="i18n.js"></script>
   <script src="popup.js"></script>
 </body>
 </html>

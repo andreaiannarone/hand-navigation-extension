@@ -50,7 +50,7 @@ function reflectSettings() {
 }
 
 function reflectToggle() {
-  els.toggleBtn.textContent = running ? '⏹ Ferma' : '▶︎ Avvia';
+  els.toggleBtn.textContent = chrome.i18n.getMessage(running ? 'stopBtn' : 'startBtn');
   els.toggleBtn.classList.toggle('running', running);
 }
 
@@ -96,25 +96,25 @@ function onSettingChange() {
 // permission can be granted correctly.
 els.cameraBtn.addEventListener('click', () => {
   chrome.tabs.create({ url: chrome.runtime.getURL('permission.html') });
-  setStatus('Concedi il permesso nella scheda aperta, poi torna qui e premi Avvia.', 'load');
+  setStatus(chrome.i18n.getMessage('permOpenedHint'), 'load');
 });
 
 // --- Start / stop -----------------------------------------------------------
 els.toggleBtn.addEventListener('click', () => {
   const type = running ? 'STOP' : 'START';
-  setStatus(running ? 'Arresto…' : 'Avvio…', 'load');
+  setStatus(chrome.i18n.getMessage(running ? 'stopping' : 'starting'), 'load');
   chrome.runtime.sendMessage({ from: 'popup', type }, (res) => {
     if (chrome.runtime.lastError) {
-      setStatus('Errore: ' + chrome.runtime.lastError.message, 'err');
+      setStatus(chrome.i18n.getMessage('errorGeneric', [chrome.runtime.lastError.message]), 'err');
       return;
     }
     if (!res || !res.ok) {
-      setStatus(res && res.error ? res.error : 'Operazione fallita.', 'err');
+      setStatus(res && res.error ? res.error : chrome.i18n.getMessage('opFailed'), 'err');
       return;
     }
     running = !running;
     reflectToggle();
-    setStatus(running ? 'In esecuzione — muovi la mano davanti alla webcam.' : 'Fermato.', running ? 'ok' : '');
+    setStatus(chrome.i18n.getMessage(running ? 'runningMsg' : 'stoppedMsg'), running ? 'ok' : '');
   });
 });
 

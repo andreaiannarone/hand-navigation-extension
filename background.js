@@ -44,7 +44,7 @@ async function ensureOffscreen() {
   await chrome.offscreen.createDocument({
     url: OFFSCREEN_PATH,
     reasons: ['USER_MEDIA'],
-    justification: 'Analisi della webcam per riconoscere i gesti della mano con MediaPipe.',
+    justification: chrome.i18n.getMessage('offscreenJustification'),
   });
 }
 

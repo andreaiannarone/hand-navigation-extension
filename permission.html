@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="en" data-i18n-title="permDocTitle">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Hand Navigation — Permesso fotocamera</title>
+  <title>Hand Navigation — Camera permission</title>
   <style>
     /* Sci-fi "Iron Man" HUD design system — see DESIGN.md */
     @font-face {
@@ -97,14 +97,15 @@
       <span class="brand-dot"></span>
       <span class="brand-label">Hand Navigation</span>
     </div>
-    <h1>🎥 Consenti la fotocamera</h1>
-    <p>Hand Navigation usa la webcam per riconoscere i gesti della mano.
+    <h1 data-i18n="permHeading">🎥 Consenti la fotocamera</h1>
+    <p data-i18n-html="permBody">Hand Navigation usa la webcam per riconoscere i gesti della mano.
        Clicca il pulsante e conferma <strong>“Consenti”</strong> nel prompt di Chrome.</p>
-    <button id="grant">Consenti fotocamera</button>
+    <button id="grant" data-i18n="permAllowBtn">Consenti fotocamera</button>
     <video id="preview" autoplay playsinline muted></video>
     <div id="msg"></div>
-    <p class="hint">Se non compare alcun prompt: controlla <em>Impostazioni di sistema → Privacy → Fotocamera → Google Chrome</em>, poi riprova.</p>
+    <p class="hint" data-i18n-html="permHint">Se non compare alcun prompt: controlla <em>Impostazioni di sistema → Privacy → Fotocamera → Google Chrome</em>, poi riprova.</p>
   </div>
+  <script src="i18n.js"></script>
   <script src="permission.js"></script>
 </body>
 </html>

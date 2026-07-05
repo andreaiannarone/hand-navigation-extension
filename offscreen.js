@@ -67,7 +67,7 @@ async function startCamera() {
       audio: false,
     });
   } catch (e) {
-    status({ state: 'error', message: 'Fotocamera non disponibile: ' + e.name + '. Concedi il permesso dal popup.' });
+    status({ state: 'error', message: chrome.i18n.getMessage('camUnavailable', [e.name]) });
     return false;
   }
   video.srcObject = stream;
@@ -213,22 +213,22 @@ function send(payload) {
 // ---------------------------------------------------------------------------
 async function startAll(newSettings) {
   if (newSettings) settings = { ...defaultSettings(), ...newSettings };
-  status({ state: 'loading', message: 'Caricamento modello…' });
+  status({ state: 'loading', message: chrome.i18n.getMessage('statusLoading') });
   try {
     await initLandmarker();
   } catch (e) {
-    status({ state: 'error', message: 'Errore modello MediaPipe: ' + e.message });
+    status({ state: 'error', message: chrome.i18n.getMessage('modelError', [e.message]) });
     return;
   }
   const ok = await startCamera();
   if (!ok) return;
-  status({ state: 'ready', message: 'Riconoscimento attivo.' });
+  status({ state: 'ready', message: chrome.i18n.getMessage('statusActive') });
   if (!rafId) loop();
 }
 
 function stopAll() {
   stopCamera();
-  status({ state: 'stopped', message: 'Fermato.' });
+  status({ state: 'stopped', message: chrome.i18n.getMessage('stoppedMsg') });
 }
 
 chrome.runtime.onMessage.addListener((msg) => {
