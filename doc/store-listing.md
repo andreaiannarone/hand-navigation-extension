@@ -2,7 +2,7 @@
 
 Draft text ready to paste into the Chrome Web Store Developer Dashboard when
 submitting **Hand Navigation**. Adjust names/links (the placeholder e-mail is
-`info@noa.agency`, taken from [`../PRIVACY.md`](../PRIVACY.md)) before
+`hello@andreaiannarone.com`, taken from [`../PRIVACY.md`](../PRIVACY.md)) before
 publishing.
 
 ## Single purpose (required field)

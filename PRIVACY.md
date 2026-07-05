@@ -64,4 +64,4 @@ will change accordingly.
 ## Contact
 
 Questions about this policy or the extension can be sent to:
-**info@noa.agency**
+**hello@andreaiannarone.com**
