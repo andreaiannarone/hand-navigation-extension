@@ -144,15 +144,7 @@
   }
 
   // --- Per-frame processing -------------------------------------------------
-  // [HandNav] Temporary diagnostic log (throttled to ~1/sec). Remove once fixed.
-  let _dbgLast = 0;
   function onHand(p) {
-    const now = Date.now();
-    if (now - _dbgLast >= 1000) {
-      _dbgLast = now;
-      console.log('[HandNav][content] HAND ricevuto — active=' + active +
-        ' present=' + p.present + ' mode=' + p.mode);
-    }
     if (!active) return;
 
     if (!p.present) {

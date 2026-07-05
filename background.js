@@ -2,15 +2,6 @@
 
 const OFFSCREEN_PATH = 'offscreen.html';
 
-// [HandNav] Temporary diagnostic log (throttled to ~1/sec). Remove once resolved.
-let _dbgLast = 0;
-function dbg(m) {
-  const now = Date.now();
-  if (now - _dbgLast < 1000) return;
-  _dbgLast = now;
-  console.log('[HandNav][bg]', m);
-}
-
 // Tab currently controlled by the gestures (set when Start is pressed in the popup).
 let targetTabId = null;
 let running = false;
@@ -195,12 +186,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   // Hand data coming from the offscreen → forward to the controlled tab.
   if (msg && msg.from === 'offscreen') {
     if (msg.type === 'HAND' && running && targetTabId != null) {
-      dbg('HAND → inoltro a tab ' + targetTabId + ' (present=' + (msg.payload && msg.payload.present) + ')');
-      chrome.tabs.sendMessage(targetTabId, { type: 'HAND', payload: msg.payload }).catch((e) => {
-        dbg('HAND → tabs.sendMessage FALLITO: ' + e.message);
-      });
-    } else if (msg.type === 'HAND') {
-      dbg('HAND SCARTATO — running=' + running + ' targetTabId=' + targetTabId);
+      chrome.tabs.sendMessage(targetTabId, { type: 'HAND', payload: msg.payload }).catch(() => {});
     } else if (msg.type === 'STATUS') {
       // Propagate status (e.g. camera ready / error) to the popup if open.
       chrome.runtime.sendMessage({ from: 'background', type: 'STATUS', payload: msg.payload }).catch(() => {});
@@ -272,7 +258,6 @@ async function retarget(tabId) {
     }
     targetTabId = null;
     await chrome.storage.local.set({ targetTabId: null });
-    dbg('retarget → pagina di sistema, controllo in pausa');
     return;
   }
 
@@ -284,12 +269,11 @@ async function retarget(tabId) {
   // Activate the overlay on the new tab.
   const settings = await getSettings();
   const ok = await ensureContentScript(tabId);
-  if (!ok) { dbg('retarget → impossibile iniettare su ' + tabId); return; }
+  if (!ok) return;
   await chrome.tabs.sendMessage(tabId, { type: 'SHOW_OVERLAY', settings }).catch(() => {});
 
   targetTabId = tabId;
   await chrome.storage.local.set({ targetTabId });
-  dbg('retarget → ora controllo la scheda ' + tabId);
 }
 
 // Active tab change within the same window.

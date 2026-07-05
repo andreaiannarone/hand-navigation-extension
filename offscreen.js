@@ -143,18 +143,9 @@ function analyze(lm) {
 // rendered), so the loop uses a ~30 fps timer.
 const FRAME_MS = 33;
 
-let _dbgLoopLast = 0;
 function loop() {
   rafId = setTimeout(loop, FRAME_MS);
-  if (!handLandmarker || video.readyState < 2) {
-    const now = Date.now();
-    if (now - _dbgLoopLast >= 1000) {
-      _dbgLoopLast = now;
-      console.log('[HandNav][offscreen] loop in attesa — handLandmarker=' +
-        !!handLandmarker + ' video.readyState=' + video.readyState);
-    }
-    return;
-  }
+  if (!handLandmarker || video.readyState < 2) return;
 
   const now = performance.now();
   if (video.currentTime === lastVideoTime) return; // no new frame
@@ -196,15 +187,7 @@ function loop() {
   send({ present: true, mode: a.mode, x: a.x, y: a.y, pinch: a.pinch, rightPinch: a.rightPinch, click, rightClick });
 }
 
-// [HandNav] Temporary diagnostic log (throttled to ~1/sec). Remove once resolved.
-let _dbgLast = 0;
 function send(payload) {
-  const now = Date.now();
-  if (now - _dbgLast >= 1000) {
-    _dbgLast = now;
-    console.log('[HandNav][offscreen] invio HAND — present=' + payload.present +
-      ' mode=' + payload.mode + ' x=' + payload.x.toFixed(2) + ' y=' + payload.y.toFixed(2));
-  }
   chrome.runtime.sendMessage({ from: 'offscreen', type: 'HAND', payload }).catch(() => {});
 }
 
