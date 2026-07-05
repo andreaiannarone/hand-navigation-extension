@@ -1,0 +1,59 @@
+{
+  "appName":            { "message": "Hand Navigation" },
+  "appDesc":            { "message": "Navigiere mit Handgesten durch Webseiten über die Webcam und MediaPipe: Cursor mit dem Zeigefinger, Klick durch Pinch-Geste, Scrollen mit offener Hand." },
+  "actionTitle":        { "message": "Hand Navigation" },
+
+  "popupSubtitle":      { "message": "Navigiere mit Handgesten" },
+  "statusReady":        { "message": "Bereit." },
+  "allowCamera":        { "message": "🎥 Kamera erlauben" },
+  "settingsTitle":      { "message": "⚙︎ Empfindlichkeit" },
+
+  "cursorSpeed":        { "message": "Cursorgeschwindigkeit" },
+  "smoothingLabel":     { "message": "Glättung (Smoothing)" },
+  "scrollSpeedLabel":   { "message": "Scrollgeschwindigkeit" },
+  "pinchClick":         { "message": "Pinch-Empfindlichkeit (Klick)" },
+  "pinchRight":         { "message": "Pinch-Empfindlichkeit (Rechtsklick)" },
+  "invertScrollLabel":  { "message": "Scrollrichtung umkehren" },
+
+  "legendCursor":       { "message": "Zeigefinger = Cursor bewegen" },
+  "legendClick":        { "message": "Pinch (Daumen+Zeigefinger) = Klick" },
+  "legendRight":        { "message": "Pinch (Daumen+Mittelfinger) = Rechtsklick" },
+  "legendScroll":       { "message": "Offene Hand = Scrollen (auf/ab)" },
+  "legendPause":        { "message": "Faust = Pause" },
+
+  "startBtn":           { "message": "▶︎ Start" },
+  "stopBtn":            { "message": "⏹ Stopp" },
+  "starting":           { "message": "Wird gestartet…" },
+  "stopping":           { "message": "Wird gestoppt…" },
+  "runningMsg":         { "message": "Aktiv — bewege die Hand vor der Webcam." },
+  "stoppedMsg":         { "message": "Gestoppt." },
+  "opFailed":           { "message": "Vorgang fehlgeschlagen." },
+  "errorGeneric":       { "message": "Fehler: $1" },
+  "permOpenedHint":     { "message": "Erteile die Berechtigung im geöffneten Tab und kehre dann hierher zurück, um Start zu drücken." },
+
+  "permDocTitle":       { "message": "Hand Navigation — Kameraberechtigung" },
+  "permHeading":        { "message": "🎥 Kamera erlauben" },
+  "permBody":           { "message": "Hand Navigation nutzt die Webcam, um Handgesten zu erkennen. Klicke auf die Schaltfläche und bestätige <strong>„Zulassen“</strong> in der Aufforderung von Chrome." },
+  "permAllowBtn":       { "message": "Kamera erlauben" },
+  "permHint":           { "message": "Falls keine Aufforderung erscheint: Prüfe <em>Systemeinstellungen → Datenschutz → Kamera → Google Chrome</em> und versuche es erneut." },
+  "permRequesting":     { "message": "Anfrage läuft… bestätige in der Aufforderung von Chrome." },
+  "permGranted":        { "message": "✓ Kamera erlaubt! Du kannst diesen Tab schließen und Start drücken." },
+  "permDenied":         { "message": "Berechtigung verweigert oder abgebrochen. Versuche es erneut und klicke auf „Zulassen“." },
+  "permNoCam":          { "message": "Keine Webcam gefunden." },
+  "permInUse":          { "message": "Die Webcam wird bereits von einer anderen App verwendet." },
+  "permErrorPrefix":    { "message": "✕ $1" },
+
+  "badgeNoHand":        { "message": "✋ keine Hand" },
+  "badgeScroll":        { "message": "↕︎ scrollen" },
+  "badgePinchRight":    { "message": "🖱 Pinch rechts" },
+  "badgePinch":         { "message": "🤏 Pinch" },
+  "badgeCursor":        { "message": "☝︎ Cursor" },
+  "badgeReady":         { "message": "☝︎ bereit" },
+
+  "statusLoading":      { "message": "Modell wird geladen…" },
+  "camUnavailable":     { "message": "Kamera nicht verfügbar: $1. Erteile die Berechtigung über das Popup." },
+  "modelError":         { "message": "Fehler im MediaPipe-Modell: $1" },
+  "statusActive":       { "message": "Erkennung aktiv." },
+
+  "offscreenJustification": { "message": "Analyse der Webcam zur Erkennung von Handgesten mit MediaPipe." }
+}

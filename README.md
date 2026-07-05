@@ -3,9 +3,10 @@
 Chrome extension (Manifest V3) that lets you navigate web pages with hand
 gestures, using the webcam and **MediaPipe HandLandmarker**.
 
-The UI is localized in **English, Italian, Spanish and French** and follows
-Chrome's own language automatically (via `chrome.i18n`), falling back to
-English if the browser's language isn't one of the four.
+The UI is localized in **English, Italian, Spanish, French, German, Polish and
+Portuguese** and follows Chrome's own language automatically (via
+`chrome.i18n`), falling back to English if the browser's language isn't one of
+these.
 
 ## Gestures
 
@@ -61,9 +62,9 @@ English if the browser's language isn't one of the four.
 
 The extension uses Chrome's built-in [i18n system](https://developer.chrome.com/docs/extensions/reference/api/i18n):
 
-- Each language lives in `_locales/<lang>/messages.json` (currently `en`, `it`, `es`, `fr`).
-  `en` is the `default_locale` — the fallback when the browser's language isn't
-  one of the supported ones.
+- Each language lives in `_locales/<lang>/messages.json` (currently `en`, `it`,
+  `es`, `fr`, `de`, `pl`, `pt`). `en` is the `default_locale` — the fallback
+  when the browser's language isn't one of the supported ones.
 - `manifest.json` uses `__MSG_key__` placeholders for the extension name/description.
 - Static HTML (`popup.html`, `permission.html`) marks translatable elements with
   `data-i18n` / `data-i18n-html` / `data-i18n-title`; `i18n.js` fills them in from

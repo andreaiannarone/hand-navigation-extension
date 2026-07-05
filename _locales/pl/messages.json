@@ -1,0 +1,59 @@
+{
+  "appName":            { "message": "Hand Navigation" },
+  "appDesc":            { "message": "Nawiguj po stronach internetowych gestami dłoni, korzystając z kamery i MediaPipe: kursor palcem wskazującym, kliknięcie przez uszczypnięcie, przewijanie otwartą dłonią." },
+  "actionTitle":        { "message": "Hand Navigation" },
+
+  "popupSubtitle":      { "message": "Nawiguj gestami dłoni" },
+  "statusReady":        { "message": "Gotowe." },
+  "allowCamera":        { "message": "🎥 Zezwól na kamerę" },
+  "settingsTitle":      { "message": "⚙︎ Czułość" },
+
+  "cursorSpeed":        { "message": "Szybkość kursora" },
+  "smoothingLabel":     { "message": "Płynność (wygładzanie)" },
+  "scrollSpeedLabel":   { "message": "Szybkość przewijania" },
+  "pinchClick":         { "message": "Czułość uszczypnięcia (kliknięcie)" },
+  "pinchRight":         { "message": "Czułość uszczypnięcia (prawy przycisk)" },
+  "invertScrollLabel":  { "message": "Odwróć kierunek przewijania" },
+
+  "legendCursor":       { "message": "Palec wskazujący = przesuwa kursor" },
+  "legendClick":        { "message": "Uszczypnięcie (kciuk+wskazujący) = kliknięcie" },
+  "legendRight":        { "message": "Uszczypnięcie (kciuk+środkowy) = prawy przycisk" },
+  "legendScroll":       { "message": "Otwarta dłoń = przewijanie (góra/dół)" },
+  "legendPause":        { "message": "Pięść = pauza" },
+
+  "startBtn":           { "message": "▶︎ Uruchom" },
+  "stopBtn":            { "message": "⏹ Zatrzymaj" },
+  "starting":           { "message": "Uruchamianie…" },
+  "stopping":           { "message": "Zatrzymywanie…" },
+  "runningMsg":         { "message": "Działa — poruszaj dłonią przed kamerą." },
+  "stoppedMsg":         { "message": "Zatrzymano." },
+  "opFailed":           { "message": "Operacja nie powiodła się." },
+  "errorGeneric":       { "message": "Błąd: $1" },
+  "permOpenedHint":     { "message": "Udziel zgody na otwartej karcie, a następnie wróć tutaj i naciśnij Uruchom." },
+
+  "permDocTitle":       { "message": "Hand Navigation — Zgoda na kamerę" },
+  "permHeading":        { "message": "🎥 Zezwól na kamerę" },
+  "permBody":           { "message": "Hand Navigation używa kamery do rozpoznawania gestów dłoni. Kliknij przycisk i potwierdź <strong>„Zezwól”</strong> w monicie Chrome." },
+  "permAllowBtn":       { "message": "Zezwól na kamerę" },
+  "permHint":           { "message": "Jeśli monit się nie pojawi: sprawdź <em>Ustawienia systemowe → Prywatność → Kamera → Google Chrome</em>, a następnie spróbuj ponownie." },
+  "permRequesting":     { "message": "Trwa żądanie… potwierdź w monicie Chrome." },
+  "permGranted":        { "message": "✓ Kamera dozwolona! Możesz zamknąć tę kartę i nacisnąć Uruchom." },
+  "permDenied":         { "message": "Odmówiono uprawnienia lub anulowano. Spróbuj ponownie i kliknij „Zezwól”." },
+  "permNoCam":          { "message": "Nie znaleziono kamery internetowej." },
+  "permInUse":          { "message": "Kamera jest już używana przez inną aplikację." },
+  "permErrorPrefix":    { "message": "✕ $1" },
+
+  "badgeNoHand":        { "message": "✋ brak dłoni" },
+  "badgeScroll":        { "message": "↕︎ przewijanie" },
+  "badgePinchRight":    { "message": "🖱 uszczypnięcie prawe" },
+  "badgePinch":         { "message": "🤏 uszczypnięcie" },
+  "badgeCursor":        { "message": "☝︎ kursor" },
+  "badgeReady":         { "message": "☝︎ gotowe" },
+
+  "statusLoading":      { "message": "Wczytywanie modelu…" },
+  "camUnavailable":     { "message": "Kamera niedostępna: $1. Udziel zgody z poziomu wyskakującego okienka." },
+  "modelError":         { "message": "Błąd modelu MediaPipe: $1" },
+  "statusActive":       { "message": "Rozpoznawanie aktywne." },
+
+  "offscreenJustification": { "message": "Analiza obrazu z kamery w celu rozpoznawania gestów dłoni za pomocą MediaPipe." }
+}
