@@ -15,7 +15,10 @@
     <p class="sub" data-i18n="popupSubtitle">Naviga con i gesti della mano</p>
   </header>
 
-  <div id="status" class="status" data-i18n="statusReady">Pronto.</div>
+  <div id="status" class="status">
+    <span class="status-dot"></span>
+    <span id="statusText" data-i18n="statusReady">Pronto.</span>
+  </div>
 
   <button id="cameraBtn" class="btn btn-secondary" data-i18n="allowCamera">🎥 Consenti fotocamera</button>
   <button id="toggleBtn" class="btn btn-primary" data-i18n="startBtn">▶︎ Avvia</button>
@@ -23,35 +26,37 @@
   <details class="settings">
     <summary data-i18n="settingsTitle">⚙︎ Sensibilità</summary>
 
-    <label>
-      <span data-i18n="cursorSpeed">Velocità cursore</span> <output id="cursorGainOut"></output>
-      <input type="range" id="cursorGain" min="1" max="3" step="0.1" />
-    </label>
+    <div class="settings-body">
+      <label>
+        <span data-i18n="cursorSpeed">Velocità cursore</span> <output id="cursorGainOut"></output>
+        <input type="range" id="cursorGain" min="1" max="3" step="0.1" />
+      </label>
 
-    <label>
-      <span data-i18n="smoothingLabel">Fluidità (smoothing)</span> <output id="smoothingOut"></output>
-      <input type="range" id="smoothing" min="0" max="0.9" step="0.05" />
-    </label>
+      <label>
+        <span data-i18n="smoothingLabel">Fluidità (smoothing)</span> <output id="smoothingOut"></output>
+        <input type="range" id="smoothing" min="0" max="0.9" step="0.05" />
+      </label>
 
-    <label>
-      <span data-i18n="scrollSpeedLabel">Velocità scroll</span> <output id="scrollSpeedOut"></output>
-      <input type="range" id="scrollSpeed" min="0.5" max="3" step="0.1" />
-    </label>
+      <label>
+        <span data-i18n="scrollSpeedLabel">Velocità scroll</span> <output id="scrollSpeedOut"></output>
+        <input type="range" id="scrollSpeed" min="0.5" max="3" step="0.1" />
+      </label>
 
-    <label>
-      <span data-i18n="pinchClick">Sensibilità pinch (click)</span> <output id="pinchThresholdOut"></output>
-      <input type="range" id="pinchThreshold" min="0.2" max="0.5" step="0.02" />
-    </label>
+      <label>
+        <span data-i18n="pinchClick">Sensibilità pinch (click)</span> <output id="pinchThresholdOut"></output>
+        <input type="range" id="pinchThreshold" min="0.2" max="0.5" step="0.02" />
+      </label>
 
-    <label>
-      <span data-i18n="pinchRight">Sensibilità pinch (tasto destro)</span> <output id="rightPinchThresholdOut"></output>
-      <input type="range" id="rightPinchThreshold" min="0.2" max="0.5" step="0.02" />
-    </label>
+      <label>
+        <span data-i18n="pinchRight">Sensibilità pinch (tasto destro)</span> <output id="rightPinchThresholdOut"></output>
+        <input type="range" id="rightPinchThreshold" min="0.2" max="0.5" step="0.02" />
+      </label>
 
-    <label class="checkbox">
-      <input type="checkbox" id="invertScroll" />
-      <span data-i18n="invertScrollLabel">Inverti direzione scroll</span>
-    </label>
+      <label class="checkbox">
+        <input type="checkbox" id="invertScroll" />
+        <span data-i18n="invertScrollLabel">Inverti direzione scroll</span>
+      </label>
+    </div>
   </details>
 
   <div class="legend">

@@ -86,8 +86,8 @@
   letter-spacing: 0.12em;
   color: #e4e4e7;
   background: rgba(9, 9, 11, 0.72);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
   z-index: 2147483647;
@@ -95,8 +95,8 @@
 }
 #handnav-badge::before {
   content: "";
-  width: 7px;
-  height: 7px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   background: #3b82f6;
   box-shadow: 0 0 8px rgba(59, 130, 246, 0.8);

@@ -12,6 +12,7 @@ const DEFAULT_SETTINGS = {
 
 const els = {
   status: document.getElementById('status'),
+  statusText: document.getElementById('statusText'),
   cameraBtn: document.getElementById('cameraBtn'),
   toggleBtn: document.getElementById('toggleBtn'),
   cursorGain: document.getElementById('cursorGain'),
@@ -31,7 +32,7 @@ let settings = { ...DEFAULT_SETTINGS };
 let running = false;
 
 function setStatus(text, kind) {
-  els.status.textContent = text;
+  els.statusText.textContent = text;
   els.status.className = 'status' + (kind ? ' ' + kind : '');
 }
 

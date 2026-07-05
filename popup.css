@@ -26,10 +26,21 @@
   --accent-light: #60a5fa;  /* blue-400 */
   --accent-hud: #58a6ff;    /* Iron Man blue */
   --live: #ef4444;          /* red-500 */
+  --surface-800: #27272a;   /* zinc-800 — sub-section background */
+  --widget-border: #3f3f46; /* zinc-700 — sub-section border */
+  --muted-dot: #52525b;     /* zinc-600 — inactive status dot */
   --glass: rgba(0, 0, 0, 0.4);
   --border: rgba(255, 255, 255, 0.1);
+  --blur: 12px;             /* backdrop-blur-md */
   --font: 'Play', ui-monospace, 'Segoe UI', sans-serif;
 }
+
+::selection { background: rgba(59, 130, 246, 0.3); }
+
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--surface-800); }
+::-webkit-scrollbar-thumb { background: var(--widget-border); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #52525b; }
 
 * { box-sizing: border-box; }
 
@@ -92,15 +103,18 @@ h1 {
 
 /* --- Status (glass pill) -------------------------------------------------- */
 .status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   font-size: 10px;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  text-align: center;
   padding: 8px 12px;
-  border-radius: 999px;
+  border-radius: 9999px;
   background: var(--glass);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(var(--blur));
+  -webkit-backdrop-filter: blur(var(--blur));
   border: 1px solid var(--border);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
   margin-bottom: 12px;
@@ -108,18 +122,47 @@ h1 {
   color: var(--muted);
   transition: color 0.3s, border-color 0.3s, box-shadow 0.3s;
 }
+/* Il puntino comunica lo stato a colpo d'occhio, indipendentemente dal testo. */
+.status-dot {
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--muted-dot);
+  transition: background 0.3s, box-shadow 0.3s;
+}
+/* Ready/ok = accento blu, come da sezione 4.5 (Loader) e principio "la luce comunica lo stato". */
 .status.ok {
   color: var(--accent-light);
   border-color: rgba(59, 130, 246, 0.4);
   box-shadow: 0 0 14px rgba(59, 130, 246, 0.25);
 }
+.status.ok .status-dot {
+  background: var(--accent-light);
+  box-shadow: 0 0 8px rgba(96, 165, 250, 0.8);
+}
 .status.err {
   color: #fca5a5;
   border-color: rgba(239, 68, 68, 0.4);
 }
+.status.err .status-dot {
+  background: var(--live);
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.8);
+}
+/* Caricamento: blu (come il Loader della sezione 4.5), non ambra — il giallo è
+   riservato alla misura del gesto. Il puntino pulsa per segnalare "in corso". */
 .status.load {
-  color: #fcd34d;
-  border-color: rgba(234, 179, 8, 0.35);
+  color: var(--accent-light);
+  border-color: rgba(59, 130, 246, 0.3);
+}
+.status.load .status-dot {
+  background: var(--accent);
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.8);
+  animation: handnav-load-pulse 1.4s ease-in-out infinite;
+}
+@keyframes handnav-load-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.35; }
 }
 
 /* --- Buttons --------------------------------------------------------------- */
@@ -140,8 +183,8 @@ h1 {
 }
 .btn-secondary {
   background: var(--glass);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(var(--blur));
+  -webkit-backdrop-filter: blur(var(--blur));
   color: var(--text);
 }
 .btn-secondary:hover {
@@ -187,6 +230,8 @@ summary {
   border: 1px solid var(--border);
   border-radius: 10px;
   background: var(--glass);
+  backdrop-filter: blur(var(--blur));
+  -webkit-backdrop-filter: blur(var(--blur));
   transition: color 0.2s, border-color 0.2s;
 }
 summary::-webkit-details-marker { display: none; }
@@ -197,6 +242,14 @@ summary:hover {
 .settings[open] summary {
   color: var(--accent-light);
   margin-bottom: 6px;
+}
+/* Sotto-sezione (§4.4): raggruppa i controlli in un riquadro leggermente
+   staccato dallo sfondo, invece di lasciarli fluttuare liberi. */
+.settings-body {
+  background: rgba(39, 39, 42, 0.5);   /* zinc-800/50 */
+  border: 1px solid rgba(63, 63, 70, 0.5); /* zinc-700/50 */
+  border-radius: 12px;
+  padding: 4px 12px 12px;
 }
 .settings label {
   display: block;
