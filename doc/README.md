@@ -19,6 +19,7 @@ up-to-date map of the extension.
 | [design-system.md](design-system.md) | Summary of the HUD design system and where it's applied in the code |
 | [installation-and-usage.md](installation-and-usage.md) | Installation, first run, camera permission, calibration |
 | [permissions-and-privacy.md](permissions-and-privacy.md) | Manifest permissions, why they're needed, privacy/offline notes |
+| [store-listing.md](store-listing.md) | Draft copy and checklist for publishing on the Chrome Web Store |
 
 ## Quick overview
 

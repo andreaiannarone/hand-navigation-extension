@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Privacy Policy — Hand Navigation</title>
+<meta name="description" content="Privacy policy for the Hand Navigation Chrome extension." />
+<style>
+  :root {
+    --accent: #3b82f6;
+    --accent-light: #60a5fa;
+    --text: #18181b;
+    --muted: #52525b;
+    --bg: #ffffff;
+    --panel: #f4f4f5;
+    --border: #e4e4e7;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --text: #e4e4e7;
+      --muted: #a1a1aa;
+      --bg: #09090b;
+      --panel: #18181b;
+      --border: #27272a;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+  }
+  .wrap {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 48px 20px 80px;
+  }
+  header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 8px rgba(59, 130, 246, 0.8);
+    flex: none;
+  }
+  h1 {
+    font-size: 1.5rem;
+    margin: 0;
+  }
+  .updated {
+    color: var(--muted);
+    font-size: 0.85rem;
+    margin: 0 0 32px;
+  }
+  h2 {
+    font-size: 1.1rem;
+    margin-top: 2.2em;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.4em;
+  }
+  p, li { color: var(--text); }
+  ul { padding-left: 1.2em; }
+  a { color: var(--accent-light); }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1em 0;
+    font-size: 0.92rem;
+  }
+  th, td {
+    text-align: left;
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    vertical-align: top;
+  }
+  th {
+    background: var(--panel);
+  }
+  code {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.1em 0.4em;
+    font-size: 0.9em;
+  }
+  .back {
+    display: inline-block;
+    margin-top: 48px;
+    font-size: 0.9rem;
+    color: var(--muted);
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <span class="dot"></span>
+    <h1>Hand Navigation — Privacy Policy</h1>
+  </header>
+  <p class="updated">Last updated: 2026-07-05</p>
+
+  <p><strong>Hand Navigation</strong> ("the extension") lets you navigate web
+  pages using hand gestures captured by your webcam. This page explains what
+  data the extension accesses and, more importantly, what it does
+  <strong>not</strong> do with it.</p>
+
+  <h2>What the extension accesses</h2>
+  <ul>
+    <li><strong>Webcam video</strong>: used only to detect the position and
+      shape of your hand (via the on-device MediaPipe HandLandmarker model)
+      in order to move a virtual cursor, click, scroll, and open a context
+      menu on the page you're viewing.</li>
+    <li><strong>The active tab's content</strong>, to the extent needed to
+      move the cursor, dispatch clicks, scroll, and show the on-page
+      overlay.</li>
+  </ul>
+
+  <h2>What the extension does NOT do</h2>
+  <ul>
+    <li>It does <strong>not</strong> record, store, or save any video or
+      image from your webcam. Frames are analyzed in memory, frame by frame,
+      and discarded immediately.</li>
+    <li>It does <strong>not</strong> send any video, image, or derived data
+      to any server. All hand-tracking inference runs <strong>entirely on
+      your device</strong>, using a model bundled with the extension —
+      there is no network request to any external service, CDN, or
+      analytics/tracking provider.</li>
+    <li>It does <strong>not</strong> collect, transmit, or sell any personal
+      or browsing data.</li>
+    <li>It does <strong>not</strong> use cookies or any remote tracking
+      mechanism.</li>
+  </ul>
+
+  <h2>Local settings storage</h2>
+  <p>Your calibration preferences (cursor speed, smoothing, scroll speed,
+  pinch sensitivity, invert-scroll) and the extension's on/off state are
+  saved locally on your device using the browser's extension storage
+  (<code>chrome.storage.local</code>). This data never leaves your device
+  and is not accessible to us or to any third party.</p>
+
+  <h2>Permissions used and why</h2>
+  <table>
+    <thead>
+      <tr><th>Permission</th><th>Purpose</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Camera (via the browser's media permission prompt)</td>
+        <td>Capture video frames to recognize hand gestures, processed
+        locally.</td>
+      </tr>
+      <tr>
+        <td><code>storage</code></td>
+        <td>Save your calibration settings and on/off state locally on your
+        device.</td>
+      </tr>
+      <tr>
+        <td><code>offscreen</code></td>
+        <td>Run the webcam capture and gesture recognition in a hidden
+        document, since this isn't possible from the extension's background
+        service worker.</td>
+      </tr>
+      <tr>
+        <td><code>scripting</code></td>
+        <td>Show the virtual cursor/overlay on pages that were already open
+        before the extension started.</td>
+      </tr>
+      <tr>
+        <td><code>activeTab</code> / host access on all sites</td>
+        <td>Let the virtual cursor, clicks, scroll, and context menu work on
+        whatever page you're currently viewing.</td>
+      </tr>
+      <tr>
+        <td><code>debugger</code></td>
+        <td>Used exclusively to send a native right-click event to Chrome
+        (via the DevTools Protocol) so the browser's own context menu can be
+        opened by a hand gesture. It is never used to inspect, log, or
+        transmit page content, network traffic, or any other data. It is
+        detached automatically as soon as you press Stop.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Third-party components</h2>
+  <p>The extension bundles the following local components, which run
+  entirely on-device and do not communicate with any server:</p>
+  <ul>
+    <li><strong>MediaPipe Tasks Vision</strong> and the
+      <code>hand_landmarker.task</code> model — © Google,
+      <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache-2.0 license</a>.</li>
+    <li><strong>Play font</strong> — © Jonas Hecksher,
+      <a href="https://openfontlicense.org">SIL Open Font License 1.1</a>.</li>
+  </ul>
+
+  <h2>Changes to this policy</h2>
+  <p>If this policy is updated, the "Last updated" date at the top of this
+  page will change accordingly.</p>
+
+  <h2>Contact</h2>
+  <p>Questions about this policy or the extension can be sent to:
+  <a href="mailto:info@noa.agency">info@noa.agency</a></p>
+
+  <a class="back" href="https://github.com/andreaiannarone/hand-navigation-extension">← Back to the Hand Navigation repository</a>
+</div>
+</body>
+</html>
