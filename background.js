@@ -1,10 +1,12 @@
 // Service worker: coordinates offscreen (webcam + MediaPipe), popup and content script.
 
 const OFFSCREEN_PATH = 'offscreen.html';
+const PERMISSION_PATH = 'permission.html';
 
 // Tab currently controlled by the gestures (set when Start is pressed in the popup).
 let targetTabId = null;
 let running = false;
+let permissionTabOpenedAt = 0;
 
 // MV3: the service worker can be terminated after a few seconds of inactivity and
 // restarted on the next message, losing the variables above. Without this
@@ -179,6 +181,25 @@ async function stop() {
   await closeOffscreen();
 }
 
+async function handleOffscreenError(payload = {}) {
+  if (!['NotAllowedError', 'PermissionDeniedError'].includes(payload.code)) return;
+
+  running = false;
+  await chrome.storage.local.set({ running: false });
+
+  if (targetTabId != null) {
+    chrome.tabs.sendMessage(targetTabId, { type: 'HIDE_OVERLAY' }).catch(() => {});
+  }
+  await detachDebugger();
+  await closeOffscreen();
+
+  // Avoid opening multiple permission tabs if the user presses Start repeatedly.
+  const now = Date.now();
+  if (now - permissionTabOpenedAt < 3000) return;
+  permissionTabOpenedAt = now;
+  chrome.tabs.create({ url: chrome.runtime.getURL(PERMISSION_PATH) }).catch(() => {});
+}
+
 // ---------------------------------------------------------------------------
 // Message router
 // ---------------------------------------------------------------------------
@@ -188,6 +209,9 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     if (msg.type === 'HAND' && running && targetTabId != null) {
       chrome.tabs.sendMessage(targetTabId, { type: 'HAND', payload: msg.payload }).catch(() => {});
     } else if (msg.type === 'STATUS') {
+      if (msg.payload && msg.payload.state === 'error') {
+        handleOffscreenError(msg.payload).catch(() => {});
+      }
       // Propagate status (e.g. camera ready / error) to the popup if open.
       chrome.runtime.sendMessage({ from: 'background', type: 'STATUS', payload: msg.payload }).catch(() => {});
     }
@@ -198,6 +222,22 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg && msg.from === 'content' && msg.type === 'RIGHT_CLICK') {
     const tabId = sender.tab && sender.tab.id;
     if (running && tabId != null) nativeRightClick(tabId, msg.x, msg.y);
+    return;
+  }
+
+  if (msg && msg.from === 'content' && msg.type === 'CONTEXT_ACTION') {
+    const tabId = sender.tab && sender.tab.id;
+    if (tabId == null) return;
+
+    if (msg.action === 'back') {
+      chrome.tabs.goBack(tabId).catch(() => {});
+    } else if (msg.action === 'forward') {
+      chrome.tabs.goForward(tabId).catch(() => {});
+    } else if (msg.action === 'reload') {
+      chrome.tabs.reload(tabId).catch(() => {});
+    } else if (msg.action === 'openUrl' && msg.data && msg.data.url) {
+      chrome.tabs.create({ url: msg.data.url, active: true }).catch(() => {});
+    }
     return;
   }
 

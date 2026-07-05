@@ -10,19 +10,44 @@ let stream = null;
 let rafId = null;
 let lastVideoTime = -1;
 
-// State for click detection (edge-triggered + cooldown).
-let prevPinch = false;
+// State for click detection (edge-triggered + cooldown + hysteresis).
+let leftPinchDown = false;
 let lastClickAt = 0;
-let prevRightPinch = false;
+let leftPinchFrames = 0;
+let rightPinchDown = false;
 let lastRightClickAt = 0;
+let rightPinchFrames = 0;
 
 let settings = defaultSettings();
+
+const FALLBACK_MESSAGES = {
+  camUnavailable: 'Fotocamera non disponibile ({0}). Concedi il permesso nella scheda aperta.',
+  modelError: 'Hand tracking model failed to load: {0}',
+  statusLoading: 'Loading hand tracking...',
+  statusActive: 'Hand tracking active.',
+  stoppedMsg: 'Stopped.',
+};
+
+function msg(key, substitutions = []) {
+  const text = chrome.i18n && chrome.i18n.getMessage
+    ? chrome.i18n.getMessage(key, substitutions)
+    : '';
+  if (text) return text;
+
+  const fallback = FALLBACK_MESSAGES[key] || key;
+  return substitutions.reduce(
+    (value, substitution, index) => value.replace(`{${index}}`, substitution),
+    fallback
+  );
+}
 
 function defaultSettings() {
   return {
     pinchThreshold: 0.32,      // ratio dist(thumb,index)/hand length → left click
     rightPinchThreshold: 0.32, // ratio dist(thumb,middle)/hand length → right click
     clickCooldownMs: 450,
+    pinchReleaseMargin: 0.08,
+    minPinchFrames: 2,
   };
 }
 
@@ -46,6 +71,9 @@ async function initLandmarker() {
       baseOptions: { ...baseOptions, delegate: 'GPU' },
       runningMode: 'VIDEO',
       numHands: 1,
+      minHandDetectionConfidence: 0.65,
+      minHandPresenceConfidence: 0.65,
+      minTrackingConfidence: 0.65,
     });
   } catch (e) {
     // Fall back to CPU if the GPU is not available in the offscreen document.
@@ -53,6 +81,9 @@ async function initLandmarker() {
       baseOptions: { ...baseOptions, delegate: 'CPU' },
       runningMode: 'VIDEO',
       numHands: 1,
+      minHandDetectionConfidence: 0.65,
+      minHandPresenceConfidence: 0.65,
+      minTrackingConfidence: 0.65,
     });
   }
 }
@@ -67,7 +98,7 @@ async function startCamera() {
       audio: false,
     });
   } catch (e) {
-    status({ state: 'error', message: chrome.i18n.getMessage('camUnavailable', [e.name]) });
+    status({ state: 'error', code: e.name, message: msg('camUnavailable', [e.name]) });
     return false;
   }
   video.srcObject = stream;
@@ -109,12 +140,25 @@ function analyze(lm) {
   const pinky = fingerExtended(lm, 20, 18);
 
   const pinchRatio = dist(lm[4], lm[8]) / handLen;
-  const pinch = pinchRatio < settings.pinchThreshold;
 
   // Thumb+middle pinch → right click. The index stays extended, so the cursor
   // keeps pointing with the index tip while the middle finger touches the thumb.
   const rightPinchRatio = dist(lm[4], lm[12]) / handLen;
-  const rightPinch = index && rightPinchRatio < settings.rightPinchThreshold;
+
+  const leftCandidate = pinchRatio < settings.pinchThreshold;
+  const rightCandidate = index && rightPinchRatio < settings.rightPinchThreshold;
+
+  // Keep the gestures exclusive. If both distances are small, choose the
+  // finger that is clearly closer to the thumb; otherwise wait for a clearer
+  // frame instead of firing the wrong click.
+  const dominance = 0.035;
+  let pinch = false;
+  let rightPinch = false;
+  if (leftCandidate && (!rightCandidate || pinchRatio < rightPinchRatio - dominance)) {
+    pinch = true;
+  } else if (rightCandidate && rightPinchRatio < pinchRatio - dominance) {
+    rightPinch = true;
+  }
 
   const openPalm = index && middle && ring && pinky;
   const pointing = index && !middle && !ring && !pinky;
@@ -133,7 +177,33 @@ function analyze(lm) {
   const x = 1 - track.x;
   const y = track.y;
 
-  return { mode, x, y, pinch, rightPinch };
+  return { mode, x, y, pinch, rightPinch, pinchRatio, rightPinchRatio };
+}
+
+function resetPinches() {
+  leftPinchDown = false;
+  leftPinchFrames = 0;
+  rightPinchDown = false;
+  rightPinchFrames = 0;
+}
+
+function updatePinchState(active, ratio, pressThreshold, down, frames) {
+  const releaseThreshold = pressThreshold + settings.pinchReleaseMargin;
+  if (down) {
+    return {
+      down: active && ratio < releaseThreshold,
+      frames: active ? Math.max(frames, 1) : 0,
+      pressed: false,
+    };
+  }
+
+  const nextFrames = active ? frames + 1 : 0;
+  const pressed = nextFrames >= settings.minPinchFrames;
+  return {
+    down: pressed,
+    frames: pressed ? settings.minPinchFrames : nextFrames,
+    pressed,
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -160,29 +230,46 @@ function loop() {
 
   if (!result || !result.landmarks || result.landmarks.length === 0) {
     send({ present: false, mode: 'idle', x: 0, y: 0, pinch: false, rightPinch: false, click: false, rightClick: false });
-    prevPinch = false;
-    prevRightPinch = false;
+    resetPinches();
     return;
   }
 
   const lm = result.landmarks[0];
   const a = analyze(lm);
 
-  // Left-click detection: rising edge of the pinch + cooldown.
   let click = false;
-  if (a.pinch && !prevPinch && (now - lastClickAt) > settings.clickCooldownMs) {
+  const leftActive = a.pinch ||
+    (leftPinchDown && !a.rightPinch && a.pinchRatio < settings.pinchThreshold + settings.pinchReleaseMargin);
+  const leftState = updatePinchState(
+    leftActive,
+    a.pinchRatio,
+    settings.pinchThreshold,
+    leftPinchDown,
+    leftPinchFrames
+  );
+  leftPinchDown = leftState.down;
+  leftPinchFrames = leftState.frames;
+  if (leftState.pressed && (now - lastClickAt) > settings.clickCooldownMs) {
     click = true;
     lastClickAt = now;
   }
-  prevPinch = a.pinch;
 
-  // Right-click detection: rising edge of the thumb+middle pinch + cooldown.
   let rightClick = false;
-  if (a.rightPinch && !prevRightPinch && (now - lastRightClickAt) > settings.clickCooldownMs) {
+  const rightActive = a.rightPinch ||
+    (rightPinchDown && !a.pinch && a.rightPinchRatio < settings.rightPinchThreshold + settings.pinchReleaseMargin);
+  const rightState = updatePinchState(
+    rightActive,
+    a.rightPinchRatio,
+    settings.rightPinchThreshold,
+    rightPinchDown,
+    rightPinchFrames
+  );
+  rightPinchDown = rightState.down;
+  rightPinchFrames = rightState.frames;
+  if (rightState.pressed && (now - lastRightClickAt) > settings.clickCooldownMs) {
     rightClick = true;
     lastRightClickAt = now;
   }
-  prevRightPinch = a.rightPinch;
 
   send({ present: true, mode: a.mode, x: a.x, y: a.y, pinch: a.pinch, rightPinch: a.rightPinch, click, rightClick });
 }
@@ -196,22 +283,22 @@ function send(payload) {
 // ---------------------------------------------------------------------------
 async function startAll(newSettings) {
   if (newSettings) settings = { ...defaultSettings(), ...newSettings };
-  status({ state: 'loading', message: chrome.i18n.getMessage('statusLoading') });
+  status({ state: 'loading', message: msg('statusLoading') });
   try {
     await initLandmarker();
   } catch (e) {
-    status({ state: 'error', message: chrome.i18n.getMessage('modelError', [e.message]) });
+    status({ state: 'error', message: msg('modelError', [e.message]) });
     return;
   }
   const ok = await startCamera();
   if (!ok) return;
-  status({ state: 'ready', message: chrome.i18n.getMessage('statusActive') });
+  status({ state: 'ready', message: msg('statusActive') });
   if (!rafId) loop();
 }
 
 function stopAll() {
   stopCamera();
-  status({ state: 'stopped', message: chrome.i18n.getMessage('stoppedMsg') });
+  status({ state: 'stopped', message: msg('stoppedMsg') });
 }
 
 chrome.runtime.onMessage.addListener((msg) => {

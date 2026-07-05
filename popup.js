@@ -2,7 +2,7 @@
 
 const DEFAULT_SETTINGS = {
   cursorGain: 1.6,
-  smoothing: 0.6,
+  smoothing: 0.72,
   scrollSpeed: 1.4,
   invertScroll: false,
   pinchThreshold: 0.32,
@@ -124,6 +124,10 @@ chrome.runtime.onMessage.addListener((msg) => {
   if (!msg || msg.from !== 'background' || msg.type !== 'STATUS') return;
   const p = msg.payload || {};
   const kindMap = { ready: 'ok', error: 'err', loading: 'load', stopped: '', started: 'ok' };
+  if (p.state === 'error' || p.state === 'stopped') {
+    running = false;
+    reflectToggle();
+  }
   setStatus(p.message || p.state || '', kindMap[p.state] ?? '');
 });
 
