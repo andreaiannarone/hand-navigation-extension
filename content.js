@@ -1,32 +1,32 @@
-// Content script: riceve i dati della mano, muove un cursore virtuale ed
-// esegue click e scroll sulla pagina.
+// Content script: receives hand data, moves a virtual cursor, and
+// performs clicks and scrolling on the page.
 
 (() => {
-  if (window.__handNavLoaded) return; // evita doppia inizializzazione
+  if (window.__handNavLoaded) return; // avoid double initialization
   window.__handNavLoaded = true;
 
-  // --- Impostazioni (aggiornate dal popup) ---------------------------------
+  // --- Settings (updated from the popup) -----------------------------------
   let settings = {
-    cursorGain: 1.6,   // amplifica il movimento della mano sullo schermo
-    smoothing: 0.6,    // 0 = reattivo/tremolante, 1 = molto fluido/lento
-    scrollSpeed: 1.4,  // moltiplicatore dello scroll
+    cursorGain: 1.6,   // amplifies the hand movement on screen
+    smoothing: 0.6,    // 0 = responsive/jittery, 1 = very smooth/slow
+    scrollSpeed: 1.4,  // scroll multiplier
     scrollDeadzone: 0.008,
     invertScroll: false,
   };
 
-  // --- Stato ----------------------------------------------------------------
+  // --- State ----------------------------------------------------------------
   let cursorEl = null;
   let badgeEl = null;
   let active = false;
 
   let posX = window.innerWidth / 2;
   let posY = window.innerHeight / 2;
-  let smoothedNX = 0.5, smoothedNY = 0.5; // punto normalizzato smussato
+  let smoothedNX = 0.5, smoothedNY = 0.5; // smoothed normalized point
   let hasSmoothed = false;
 
-  let scrollPrevY = null; // per calcolare il delta di scroll
-  let scrollVel = 0;      // velocità di scroll smussata (px per frame ~30fps)
-  let inertiaRAF = null;  // handle dell'animazione di inerzia
+  let scrollPrevY = null; // used to compute the scroll delta
+  let scrollVel = 0;      // smoothed scroll velocity (px per frame ~30fps)
+  let inertiaRAF = null;  // handle for the inertia animation
 
   // --- UI -------------------------------------------------------------------
   function ensureUI() {
@@ -56,9 +56,9 @@
     if (cursorEl) cursorEl.style.transform = `translate(${posX}px, ${posY}px)`;
   }
 
-  // --- Azioni ---------------------------------------------------------------
+  // --- Actions --------------------------------------------------------------
   function clickAt(px, py) {
-    // Nasconde temporaneamente il cursore per non intercettare il punto.
+    // Temporarily hides the cursor so it doesn't intercept the point.
     const el = document.elementFromPoint(px, py);
     if (!el) return;
     const opts = { bubbles: true, cancelable: true, composed: true, clientX: px, clientY: py, view: window };
@@ -71,20 +71,20 @@
       el.dispatchEvent(new MouseEvent('click', opts));
     } catch (e) {}
 
-    // Feedback visivo.
+    // Visual feedback.
     if (cursorEl) {
       cursorEl.classList.remove('handnav-click-pulse');
-      // forza reflow per ripartire l'animazione
+      // force reflow to restart the animation
       void cursorEl.offsetWidth;
       cursorEl.classList.add('handnav-click-pulse');
     }
   }
 
   function rightClickAt(px, py) {
-    // Il menu contestuale NATIVO di Chrome non è apribile dalla pagina via
-    // codice. Chiediamo quindi al service worker di iniettare un vero click
-    // destro tramite chrome.debugger (protocollo DevTools). Le coordinate sono
-    // in pixel del viewport (come clientX/clientY), che è ciò che serve a CDP.
+    // Chrome's NATIVE context menu can't be opened from the page via code.
+    // So we ask the service worker to inject a real right click through
+    // chrome.debugger (DevTools protocol). The coordinates are in viewport
+    // pixels (like clientX/clientY), which is what CDP needs.
     chrome.runtime.sendMessage({
       from: 'content',
       type: 'RIGHT_CLICK',
@@ -92,7 +92,7 @@
       y: Math.round(py),
     }).catch(() => {});
 
-    // Feedback visivo (pulse dedicato al tasto destro).
+    // Visual feedback (pulse dedicated to the right click).
     if (cursorEl) {
       cursorEl.classList.remove('handnav-rightclick-pulse');
       void cursorEl.offsetWidth;
@@ -100,21 +100,21 @@
     }
   }
 
-  // Fattore di reattività della velocità di scroll (0 = fermo, 1 = nessun
-  // smoothing). Basso = fluido ma un filo meno reattivo.
+  // Responsiveness factor for the scroll velocity (0 = still, 1 = no
+  // smoothing). Low = smooth but a touch less responsive.
   const SCROLL_RESPONSIVENESS = 0.4;
 
   function applyScroll(ny) {
-    stopInertia(); // mentre la mano guida attivamente, niente inerzia
+    stopInertia(); // while the hand is actively driving, no inertia
     if (scrollPrevY === null) { scrollPrevY = ny; return; }
     let delta = ny - scrollPrevY;
     scrollPrevY = ny;
-    // Dentro la zona morta il target è 0: la velocità si spegne dolcemente.
+    // Inside the deadzone the target is 0: the velocity fades out gently.
     if (Math.abs(delta) < settings.scrollDeadzone) delta = 0;
     const dir = settings.invertScroll ? -1 : 1;
-    // delta normalizzato → pixel (proporzionale all'altezza della finestra)
+    // normalized delta → pixels (proportional to the window height)
     const targetVel = dir * delta * settings.scrollSpeed * window.innerHeight;
-    // Smoothing esponenziale: toglie il jitter e ammorbidisce partenza/arresto.
+    // Exponential smoothing: removes jitter and softens start/stop.
     scrollVel += (targetVel - scrollVel) * SCROLL_RESPONSIVENESS;
     window.scrollBy(0, scrollVel);
   }
@@ -123,14 +123,14 @@
     if (inertiaRAF) { cancelAnimationFrame(inertiaRAF); inertiaRAF = null; }
   }
 
-  // Rilascio dello scroll: se c'era abbastanza velocità, prosegui per inerzia
-  // con attrito decrescente (effetto "flick" da trackpad).
+  // Scroll release: if there was enough velocity, keep going by inertia
+  // with decreasing friction (trackpad "flick" effect).
   function endScroll() {
     if (scrollPrevY !== null && Math.abs(scrollVel) > 0.5) {
-      // Da ~30fps (frame della mano) a ~60fps (rAF): dimezza la velocità/frame.
+      // From ~30fps (hand frames) to ~60fps (rAF): halve the velocity/frame.
       let v = scrollVel * 0.5;
-      const friction = 0.92; // decadimento per frame
-      const minVel = 0.4;    // sotto questa soglia ci si ferma
+      const friction = 0.92; // decay per frame
+      const minVel = 0.4;    // below this threshold it stops
       stopInertia();
       const step = () => {
         if (Math.abs(v) < minVel) { inertiaRAF = null; scrollVel = 0; return; }
@@ -143,8 +143,8 @@
     scrollPrevY = null;
   }
 
-  // --- Elaborazione di ogni frame ------------------------------------------
-  // [HandNav] Log diagnostico temporaneo (throttlato a ~1/sec). Rimuovere quando risolto.
+  // --- Per-frame processing -------------------------------------------------
+  // [HandNav] Temporary diagnostic log (throttled to ~1/sec). Remove once fixed.
   let _dbgLast = 0;
   function onHand(p) {
     const now = Date.now();
@@ -157,7 +157,7 @@
 
     if (!p.present) {
       setBadge('✋ nessuna mano');
-      endScroll(); // rilascio con inerzia se stavamo scorrendo
+      endScroll(); // release with inertia if we were scrolling
       return;
     }
 
@@ -169,17 +169,17 @@
       return;
     }
 
-    // Modalità cursore (anche durante il pinch).
-    endScroll(); // uscendo dallo scroll, lascia proseguire per inerzia
+    // Cursor mode (also during pinch).
+    endScroll(); // when leaving scroll, let it keep going by inertia
     cursorEl.classList.remove('handnav-scroll');
 
-    // Smoothing esponenziale del punto normalizzato.
-    const a = 1 - settings.smoothing; // fattore di reattività
+    // Exponential smoothing of the normalized point.
+    const a = 1 - settings.smoothing; // responsiveness factor
     if (!hasSmoothed) { smoothedNX = p.x; smoothedNY = p.y; hasSmoothed = true; }
     smoothedNX += (p.x - smoothedNX) * a;
     smoothedNY += (p.y - smoothedNY) * a;
 
-    // Mappa con guadagno attorno al centro, poi in pixel.
+    // Map with gain around the center, then into pixels.
     const g = settings.cursorGain;
     let nx = (smoothedNX - 0.5) * g + 0.5;
     let ny = (smoothedNY - 0.5) * g + 0.5;
@@ -205,7 +205,7 @@
     if (p.rightClick) rightClickAt(posX, posY);
   }
 
-  // --- Messaggi -------------------------------------------------------------
+  // --- Messages -------------------------------------------------------------
   chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     if (!msg) return;
     switch (msg.type) {
@@ -237,6 +237,6 @@
     }
   });
 
-  // Riadatta il cursore se la finestra cambia dimensione.
+  // Re-adjust the cursor if the window changes size.
   window.addEventListener('resize', renderCursor);
 })();

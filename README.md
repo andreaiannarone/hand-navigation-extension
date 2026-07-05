@@ -1,72 +1,75 @@
-# ✋ Hand Navigation — Naviga con la mano
+# ✋ Hand Navigation — Navigate with your hand
 
-Estensione Chrome (Manifest V3) che permette di navigare le pagine web con i
-gesti della mano, usando la webcam e **MediaPipe HandLandmarker**.
+Chrome extension (Manifest V3) that lets you navigate web pages with hand
+gestures, using the webcam and **MediaPipe HandLandmarker**.
 
-## Gesti
+> The extension's UI is in Italian; button labels below are quoted as they
+> appear, with an English gloss in parentheses.
 
-| Gesto | Azione |
-|-------|--------|
-| ☝️ Solo indice esteso | Muovi il **cursore** virtuale |
-| 🤏 Pinch (pollice + indice) | **Click** nel punto del cursore |
-| 🖱 Pinch (pollice + medio) | **Tasto destro** (menu contestuale) |
-| ✋ Mano aperta (palmo) | **Scroll** — muovi su/giù (con inerzia: una spinta prosegue e sfuma) |
-| ✊ Pugno chiuso | **Pausa** |
+## Gestures
 
-> ℹ️ Il tasto destro apre il menu contestuale **nativo** di Chrome iniettando un
-> vero click destro via `chrome.debugger` (protocollo DevTools). Per questo, a
-> riconoscimento attivo, Chrome mostra la barra gialla *"…sta effettuando il
-> debug di questo browser"*: è inevitabile con questo approccio e sparisce
-> premendo **Ferma**. Il debug si aggancia solo al primo click destro.
+| Gesture | Action |
+|---------|--------|
+| ☝️ Index finger only | Move the virtual **cursor** |
+| 🤏 Pinch (thumb + index) | **Click** at the cursor point |
+| 🖱 Pinch (thumb + middle) | **Right-click** (context menu) |
+| ✋ Open hand (palm) | **Scroll** — move up/down (with inertia: a flick keeps gliding and fades out) |
+| ✊ Closed fist | **Pause** |
 
-## Installazione
+> ℹ️ Right-click opens Chrome's **native** context menu by injecting a real
+> right-click via `chrome.debugger` (the DevTools protocol). Because of this,
+> while recognition is active Chrome shows the yellow bar *"…is debugging this
+> browser"*: it's unavoidable with this approach and disappears when you press
+> **Ferma** (Stop). The debugger only attaches on the first right-click.
 
-1. Apri `chrome://extensions`
-2. Attiva **Modalità sviluppatore** (in alto a destra)
-3. Clicca **Carica estensione non pacchettizzata**
-4. Seleziona questa cartella (`estensione-google`)
-5. Clicca sull'icona ✋ nella barra degli strumenti per aprire il popup
+## Installation
 
-## Uso
+1. Open `chrome://extensions`
+2. Enable **Developer mode** (top right)
+3. Click **Load unpacked**
+4. Select this folder (`hand-navigation-extension`)
+5. Click the ✋ icon in the toolbar to open the popup
 
-1. Nel popup premi **🎥 Consenti fotocamera** (una sola volta) e accetta il prompt
-2. Apri un sito normale (non funziona su pagine `chrome://`)
-3. Premi **▶︎ Avvia**
-4. Metti la mano davanti alla webcam e usa i gesti
+## Usage
 
-## Calibrazione (menù ⚙︎ Sensibilità)
+1. In the popup press **🎥 Consenti fotocamera** (Allow camera) once and accept the prompt
+2. Open a normal site (it doesn't work on `chrome://` pages)
+3. Press **▶︎ Avvia** (Start)
+4. Put your hand in front of the webcam and use the gestures
 
-- **Velocità cursore** — quanto il movimento della mano viene amplificato sullo schermo
-- **Fluidità (smoothing)** — più alto = più stabile ma meno reattivo
-- **Velocità scroll** — moltiplicatore dello scorrimento
-- **Sensibilità pinch (click)** — quanto è facile far scattare il click sinistro
-- **Sensibilità pinch (tasto destro)** — quanto è facile far scattare il click destro (pollice+medio)
-- **Inverti scroll** — inverte la direzione su/giù
+## Calibration (⚙︎ Sensibilità menu)
 
-## Architettura
+- **Velocità cursore** (Cursor speed) — how much hand movement is amplified on screen
+- **Fluidità (smoothing)** — higher = more stable but less responsive
+- **Velocità scroll** (Scroll speed) — scroll multiplier
+- **Sensibilità pinch (click)** — how easily the left-click triggers
+- **Sensibilità pinch (tasto destro)** — how easily the right-click (thumb+middle) triggers
+- **Inverti scroll** (Invert scroll) — flips the up/down direction
 
-- `offscreen.html` / `offscreen.js` — webcam + MediaPipe + riconoscimento gesti
-- `background.js` — service worker: coordina offscreen, popup e content script
-- `content.js` / `content.css` — cursore virtuale, click e scroll sulla pagina
-- `popup.*` — controllo ON/OFF, consenso fotocamera, impostazioni
-- `vendor/` — bundle MediaPipe (`tasks-vision`) + modello `hand_landmarker.task`, **in locale**
+## Architecture
 
-## Note
+- `offscreen.html` / `offscreen.js` — webcam + MediaPipe + gesture recognition
+- `background.js` — service worker: coordinates offscreen, popup and content script
+- `content.js` / `content.css` — virtual cursor, clicks and scrolling on the page
+- `popup.*` — ON/OFF control, camera consent, settings
+- `vendor/` — MediaPipe bundle (`tasks-vision`) + `hand_landmarker.task` model, **local**
 
-- Il primo avvio carica il modello (~7,6 MB) dalla cartella locale: nessuna
-  connessione a CDN, tutto offline.
-- Il permesso fotocamera è chiesto **una volta** sull'origine dell'estensione,
-  quindi funziona su tutti i siti (a differenza del permesso per singolo sito).
-- Il controllo "a mano libera" richiede un po' di pratica: parti con una mano ben
-  illuminata e a ~50 cm dalla webcam, poi regola gli slider.
+## Notes
 
-## Licenza
+- The first launch loads the model (~7.6 MB) from the local folder: no CDN
+  connection, everything works offline.
+- The camera permission is requested **once** on the extension's origin, so it
+  works on every site (unlike per-site permission).
+- Hands-free control takes some practice: start with a well-lit hand about
+  50 cm from the webcam, then adjust the sliders.
 
-Rilasciato sotto licenza **MIT** — vedi [`LICENSE`](LICENSE).
+## License
 
-### Componenti di terze parti (in `vendor/`)
+Released under the **MIT** license — see [`LICENSE`](LICENSE).
 
-- **MediaPipe Tasks Vision** e il modello `hand_landmarker.task` — © Google,
-  licenza [Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0).
-- **Font Play** — © Jonas Hecksher, licenza
+### Third-party components (in `vendor/`)
+
+- **MediaPipe Tasks Vision** and the `hand_landmarker.task` model — © Google,
+  licensed under [Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0).
+- **Play font** — © Jonas Hecksher, licensed under
   [SIL Open Font License 1.1](https://openfontlicense.org).

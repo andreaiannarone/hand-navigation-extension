@@ -1,7 +1,7 @@
 /* ===========================================================================
-   Overlay on-page (cursore + badge) — stile HUD sci-fi "Iron Man" (DESIGN.md).
-   Accento blu (#3b82f6 / #58a6ff), glow con shadow 0 0 8px rgba(colore,0.8).
-   NB: font di sistema (il CSS gira nel contesto della pagina, con la sua CSP).
+   On-page overlay (cursor + badge) — sci-fi "Iron Man" HUD style (DESIGN.md).
+   Blue accent (#3b82f6 / #58a6ff), glow via shadow 0 0 8px rgba(color, 0.8).
+   NB: system fonts (the CSS runs in the page context, under its own CSP).
    =========================================================================== */
 
 #handnav-cursor {
@@ -23,7 +23,7 @@
   display: none;
 }
 
-/* Punto centrale per una mira precisa: il click parte esattamente da qui. */
+/* Center dot for precise aiming: the click starts exactly from here. */
 #handnav-cursor::after {
   content: "";
   position: absolute;
@@ -38,7 +38,7 @@
   box-shadow: 0 0 4px rgba(88, 166, 255, 0.9);
 }
 
-/* Pinch (click imminente): cerchio pieno e luminoso, rimpicciolito. */
+/* Pinch (click imminent): solid, bright circle, shrunk down. */
 #handnav-cursor.handnav-pinch {
   background: rgba(88, 166, 255, 0.5);
   border-color: rgba(147, 197, 253, 0.98);            /* blue-300 */
@@ -46,14 +46,14 @@
   transform: scale(0.7);
 }
 
-/* Scroll: blu HUD più chiaro, glow più ampio per distinguerlo. */
+/* Scroll: lighter HUD blue, wider glow to tell it apart. */
 #handnav-cursor.handnav-scroll {
   border-color: rgba(88, 166, 255, 0.98);             /* #58a6ff */
   background: rgba(88, 166, 255, 0.18);
   box-shadow: 0 0 14px rgba(88, 166, 255, 0.75);
 }
 
-/* Pulse del click sinistro (blu, accento attivo). */
+/* Left-click pulse (blue, active accent). */
 #handnav-cursor.handnav-click-pulse {
   animation: handnav-pulse 0.35s ease-out;
 }
@@ -62,7 +62,7 @@
   100% { box-shadow: 0 0 0 26px rgba(59, 130, 246, 0); }
 }
 
-/* Pulse del tasto destro (indaco, dalla stessa famiglia blu→indigo dell'UI). */
+/* Right-click pulse (indigo, from the same blue→indigo family as the UI). */
 #handnav-cursor.handnav-rightclick-pulse {
   animation: handnav-rightpulse 0.35s ease-out;
 }
@@ -71,7 +71,7 @@
   100% { box-shadow: 0 0 0 26px rgba(129, 140, 248, 0); }
 }
 
-/* Badge di stato: pillola di vetro con puntino luminoso. */
+/* Status badge: glass pill with a glowing dot. */
 #handnav-badge {
   position: fixed;
   bottom: 16px;

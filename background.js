@@ -1,8 +1,8 @@
-// Service worker: coordina offscreen (webcam + MediaPipe), popup e content script.
+// Service worker: coordinates offscreen (webcam + MediaPipe), popup and content script.
 
 const OFFSCREEN_PATH = 'offscreen.html';
 
-// [HandNav] Log diagnostico temporaneo (throttlato a ~1/sec). Rimuovere quando risolto.
+// [HandNav] Temporary diagnostic log (throttled to ~1/sec). Remove once resolved.
 let _dbgLast = 0;
 function dbg(m) {
   const now = Date.now();
@@ -11,25 +11,25 @@ function dbg(m) {
   console.log('[HandNav][bg]', m);
 }
 
-// Tab attualmente controllata dai gesti (impostata quando si preme Start nel popup).
+// Tab currently controlled by the gestures (set when Start is pressed in the popup).
 let targetTabId = null;
 let running = false;
 
-// MV3: il service worker può essere terminato dopo pochi secondi di inattività e
-// riavviato al messaggio successivo, perdendo le variabili qui sopra. Senza questo
-// ripristino, dopo un riavvio i messaggi HAND verrebbero scartati (running=false /
-// targetTabId=null) e il cursore resterebbe fermo. Rileggiamo lo stato da storage
-// a ogni avvio del worker: questo codice top-level gira a ogni spin-up del SW.
+// MV3: the service worker can be terminated after a few seconds of inactivity and
+// restarted on the next message, losing the variables above. Without this
+// restore, after a restart the HAND messages would be discarded (running=false /
+// targetTabId=null) and the cursor would stay still. We re-read the state from storage
+// on every worker startup: this top-level code runs on every SW spin-up.
 chrome.storage.local.get(['running', 'targetTabId']).then((d) => {
   running = !!d.running;
   if (typeof d.targetTabId === 'number') targetTabId = d.targetTabId;
 });
 
 // ---------------------------------------------------------------------------
-// Gestione dell'offscreen document
+// Offscreen document management
 // ---------------------------------------------------------------------------
 async function hasOffscreen() {
-  // getContexts è il metodo raccomandato; fallback su hasDocument se assente.
+  // getContexts is the recommended method; fall back to hasDocument if unavailable.
   if (chrome.runtime.getContexts) {
     const contexts = await chrome.runtime.getContexts({
       contextTypes: ['OFFSCREEN_DOCUMENT'],
@@ -55,12 +55,12 @@ async function closeOffscreen() {
 }
 
 // ---------------------------------------------------------------------------
-// Click destro NATIVO tramite chrome.debugger (protocollo DevTools)
+// NATIVE right click via chrome.debugger (DevTools protocol)
 // ---------------------------------------------------------------------------
-// Una pagina web non può aprire il menu contestuale nativo di Chrome. Lo
-// otteniamo iniettando un vero evento di mouse a livello di browser via CDP
-// (Input.dispatchMouseEvent con tasto destro). Questo fa comparire la barra
-// gialla "…sta effettuando il debug di questo browser": è inevitabile.
+// A web page cannot open Chrome's native context menu. We obtain it by
+// injecting a real browser-level mouse event via CDP
+// (Input.dispatchMouseEvent with the right button). This makes the yellow
+// "…is debugging this browser" bar appear: it is unavoidable.
 let attachedTabId = null;
 
 function dbgAttach(tabId) {
@@ -115,20 +115,20 @@ async function nativeRightClick(tabId, x, y) {
   }
 }
 
-// Se l'utente chiude il debug (o la scheda naviga), Chrome ci stacca: azzeriamo.
+// If the user closes debugging (or the tab navigates), Chrome detaches us: reset.
 chrome.debugger.onDetach.addListener((source) => {
   if (source.tabId === attachedTabId) attachedTabId = null;
 });
 
 // ---------------------------------------------------------------------------
-// Utility: assicura che il content script sia presente nella tab
+// Utility: ensure the content script is present in the tab
 // ---------------------------------------------------------------------------
 async function ensureContentScript(tabId) {
   try {
     await chrome.tabs.sendMessage(tabId, { type: 'PING' });
     return true;
   } catch (e) {
-    // Non risponde: probabilmente la pagina era già aperta prima dell'install.
+    // No response: the page was probably already open before the install.
     try {
       await chrome.scripting.insertCSS({ target: { tabId }, files: ['content.css'] });
       await chrome.scripting.executeScript({ target: { tabId }, files: ['content.js'] });
@@ -146,7 +146,7 @@ async function getSettings() {
 }
 
 // ---------------------------------------------------------------------------
-// Avvio / arresto
+// Start / stop
 // ---------------------------------------------------------------------------
 async function start() {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
@@ -154,13 +154,13 @@ async function start() {
   await ensureOffscreen();
   const settings = await getSettings();
 
-  // Avvia il riconoscimento nell'offscreen (indipendente dalla scheda).
+  // Start the recognition in the offscreen (independent of the tab).
   await chrome.runtime.sendMessage({ target: 'offscreen', type: 'START', settings });
 
   running = true;
 
-  // Aggancia la scheda attiva se controllabile; altrimenti resta in attesa:
-  // il retarget aggancerà la prima scheda normale su cui l'utente andrà.
+  // Attach to the active tab if controllable; otherwise stay waiting:
+  // the retarget will attach to the first normal tab the user goes to.
   const controllable = tab && tab.id &&
     !/^(chrome|edge|about|chrome-extension|devtools|view-source):/.test(tab.url || '');
   if (controllable && await ensureContentScript(tab.id)) {
@@ -184,15 +184,15 @@ async function stop() {
       await chrome.tabs.sendMessage(targetTabId, { type: 'HIDE_OVERLAY' });
     } catch (e) {}
   }
-  await detachDebugger(); // stacca il debugger → via la barra gialla
+  await detachDebugger(); // detach the debugger → the yellow bar goes away
   await closeOffscreen();
 }
 
 // ---------------------------------------------------------------------------
-// Router dei messaggi
+// Message router
 // ---------------------------------------------------------------------------
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-  // Dati della mano provenienti dall'offscreen → inoltra alla tab controllata.
+  // Hand data coming from the offscreen → forward to the controlled tab.
   if (msg && msg.from === 'offscreen') {
     if (msg.type === 'HAND' && running && targetTabId != null) {
       dbg('HAND → inoltro a tab ' + targetTabId + ' (present=' + (msg.payload && msg.payload.present) + ')');
@@ -202,25 +202,25 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     } else if (msg.type === 'HAND') {
       dbg('HAND SCARTATO — running=' + running + ' targetTabId=' + targetTabId);
     } else if (msg.type === 'STATUS') {
-      // Propaga stato (es. camera pronta / errore) al popup se aperto.
+      // Propagate status (e.g. camera ready / error) to the popup if open.
       chrome.runtime.sendMessage({ from: 'background', type: 'STATUS', payload: msg.payload }).catch(() => {});
     }
-    return; // niente risposta asincrona necessaria
+    return; // no asynchronous response needed
   }
 
-  // Richiesta di click destro nativo dal content script.
+  // Native right-click request from the content script.
   if (msg && msg.from === 'content' && msg.type === 'RIGHT_CLICK') {
     const tabId = sender.tab && sender.tab.id;
     if (running && tabId != null) nativeRightClick(tabId, msg.x, msg.y);
     return;
   }
 
-  // Comandi dal popup.
+  // Commands from the popup.
   if (msg && msg.from === 'popup') {
     if (msg.type === 'START') {
       start().then(() => sendResponse({ ok: true }))
              .catch((e) => sendResponse({ ok: false, error: e.message }));
-      return true; // risposta asincrona
+      return true; // asynchronous response
     }
     if (msg.type === 'STOP') {
       stop().then(() => sendResponse({ ok: true }))
@@ -229,7 +229,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     }
     if (msg.type === 'UPDATE_SETTINGS') {
       chrome.storage.local.set({ settings: msg.settings }).then(() => {
-        // Propaga a chi è attivo.
+        // Propagate to whoever is active.
         chrome.runtime.sendMessage({ target: 'offscreen', type: 'SETTINGS', settings: msg.settings }).catch(() => {});
         if (targetTabId != null) {
           chrome.tabs.sendMessage(targetTabId, { type: 'SETTINGS', settings: msg.settings }).catch(() => {});
@@ -246,9 +246,9 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 });
 
 // ---------------------------------------------------------------------------
-// Segui la scheda attiva: mentre l'estensione è in esecuzione, il cursore deve
-// controllare la scheda che l'utente sta effettivamente guardando, non quella
-// dove è stato premuto Avvia.
+// Follow the active tab: while the extension is running, the cursor must
+// control the tab the user is actually looking at, not the one
+// where Start was pressed.
 // ---------------------------------------------------------------------------
 const SYSTEM_PAGE = /^(chrome|edge|about|chrome-extension|devtools|view-source):/;
 
@@ -259,13 +259,13 @@ async function retarget(tabId) {
   try {
     tab = await chrome.tabs.get(tabId);
   } catch (e) {
-    return; // scheda non più esistente
+    return; // tab no longer exists
   }
 
   const prev = targetTabId;
 
-  // Pagina di sistema (non controllabile): nascondi l'overlay e resta in attesa
-  // che l'utente torni su una pagina normale.
+  // System page (not controllable): hide the overlay and stay waiting
+  // for the user to return to a normal page.
   if (!tab || SYSTEM_PAGE.test(tab.url || '')) {
     if (prev != null) {
       chrome.tabs.sendMessage(prev, { type: 'HIDE_OVERLAY' }).catch(() => {});
@@ -276,12 +276,12 @@ async function retarget(tabId) {
     return;
   }
 
-  // Nascondi l'overlay sulla scheda precedente.
+  // Hide the overlay on the previous tab.
   if (prev != null) {
     chrome.tabs.sendMessage(prev, { type: 'HIDE_OVERLAY' }).catch(() => {});
   }
 
-  // Attiva l'overlay sulla nuova scheda.
+  // Activate the overlay on the new tab.
   const settings = await getSettings();
   const ok = await ensureContentScript(tabId);
   if (!ok) { dbg('retarget → impossibile iniettare su ' + tabId); return; }
@@ -292,12 +292,12 @@ async function retarget(tabId) {
   dbg('retarget → ora controllo la scheda ' + tabId);
 }
 
-// Cambio di scheda attiva nella stessa finestra.
+// Active tab change within the same window.
 chrome.tabs.onActivated.addListener((info) => {
   retarget(info.tabId);
 });
 
-// Cambio di finestra in primo piano (es. due finestre affiancate).
+// Change of foreground window (e.g. two windows side by side).
 chrome.windows.onFocusChanged.addListener(async (winId) => {
   if (winId === chrome.windows.WINDOW_ID_NONE) return;
   try {
@@ -306,8 +306,8 @@ chrome.windows.onFocusChanged.addListener(async (winId) => {
   } catch (e) {}
 });
 
-// La scheda controllata ha finito di navigare/ricaricare: il content script è
-// stato reiniettato dal manifest ma l'overlay è spento → riattivalo.
+// The controlled tab has finished navigating/reloading: the content script was
+// re-injected by the manifest but the overlay is off → reactivate it.
 chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
   if (running && tabId === targetTabId && changeInfo.status === 'complete') {
     getSettings().then((settings) => {
@@ -316,8 +316,8 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
   }
 });
 
-// Se la scheda controllata viene chiusa, non fermiamo tutto: liberiamo solo il
-// riferimento, così onActivated potrà agganciare la prossima scheda attiva.
+// If the controlled tab is closed, we don't stop everything: we just free the
+// reference, so onActivated can attach to the next active tab.
 chrome.tabs.onRemoved.addListener((tabId) => {
   if (tabId === targetTabId) {
     targetTabId = null;

@@ -1,6 +1,6 @@
-// Pagina dedicata per ottenere il permesso fotocamera.
-// A differenza del popup, una tab non si chiude quando appare il prompt,
-// quindi l'utente può confermare correttamente.
+// Dedicated page to obtain camera permission.
+// Unlike the popup, a tab does not close when the prompt appears,
+// so the user can confirm correctly.
 
 const btn = document.getElementById('grant');
 const msg = document.getElementById('msg');
@@ -15,11 +15,11 @@ btn.addEventListener('click', async () => {
   show('Richiesta in corso… conferma nel prompt di Chrome.', '');
   try {
     const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-    // Mostra un'anteprima come conferma visiva.
+    // Show a preview as visual confirmation.
     preview.style.display = 'block';
     preview.srcObject = stream;
     show('✓ Fotocamera consentita! Puoi chiudere questa scheda e premere Avvia.', 'ok');
-    // Rilascia la camera dopo un attimo: serviva solo a registrare il permesso.
+    // Release the camera after a moment: it was only needed to register the permission.
     setTimeout(() => {
       stream.getTracks().forEach((t) => t.stop());
       preview.style.display = 'none';

@@ -1,6 +1,6 @@
 /* ===========================================================================
-   Design system "New Element / Iron Man" — HUD sci-fi (vedi DESIGN.md)
-   Fondo scuro, accento blu, pillole in vetro, testo mono maiuscolo, glow.
+   Design system "New Element / Iron Man" — sci-fi HUD (see DESIGN.md)
+   Dark background, blue accent, glass pills, uppercase mono text, glow.
    =========================================================================== */
 
 @font-face {
@@ -24,7 +24,7 @@
   --muted: #a1a1aa;         /* zinc-400 */
   --accent: #3b82f6;        /* blue-500 */
   --accent-light: #60a5fa;  /* blue-400 */
-  --accent-hud: #58a6ff;    /* blu Iron Man */
+  --accent-hud: #58a6ff;    /* Iron Man blue */
   --live: #ef4444;          /* red-500 */
   --glass: rgba(0, 0, 0, 0.4);
   --border: rgba(255, 255, 255, 0.1);
@@ -45,7 +45,7 @@ body {
   position: relative;
 }
 
-/* Linea HUD luminosa in cima */
+/* Bright HUD line at the top */
 body::before {
   content: "";
   position: absolute;
@@ -90,7 +90,7 @@ h1 {
   letter-spacing: 0.22em;
 }
 
-/* --- Status (pillola di vetro) -------------------------------------------- */
+/* --- Status (glass pill) -------------------------------------------------- */
 .status {
   font-size: 10px;
   text-transform: uppercase;
@@ -122,7 +122,7 @@ h1 {
   border-color: rgba(234, 179, 8, 0.35);
 }
 
-/* --- Bottoni --------------------------------------------------------------- */
+/* --- Buttons --------------------------------------------------------------- */
 .btn {
   display: block;
   width: 100%;
@@ -162,7 +162,7 @@ h1 {
 .btn-primary:hover {
   background: linear-gradient(135deg, var(--accent-light), #6366f1);
 }
-/* Stato "in esecuzione" = live → rosso pulsante (rosso riservato al live) */
+/* "Running" state = live → pulsing red (red reserved for live) */
 .btn-primary.running {
   background: linear-gradient(135deg, #ef4444, #b91c1c);
   box-shadow: 0 0 16px rgba(239, 68, 68, 0.4);
@@ -173,7 +173,7 @@ h1 {
   50%      { box-shadow: 0 0 22px rgba(239, 68, 68, 0.6); }
 }
 
-/* --- Impostazioni ---------------------------------------------------------- */
+/* --- Settings -------------------------------------------------------------- */
 .settings { margin: 4px 0 12px; }
 summary {
   cursor: pointer;
@@ -226,7 +226,7 @@ summary:hover {
   font-variant-numeric: tabular-nums;
 }
 
-/* --- Legenda gesti (righe di vetro) --------------------------------------- */
+/* --- Gesture legend (glass rows) ------------------------------------------ */
 .legend {
   margin-top: 4px;
   border-top: 1px solid var(--border);

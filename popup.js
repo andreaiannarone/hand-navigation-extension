@@ -1,4 +1,4 @@
-// Popup: controllo ON/OFF, consenso fotocamera, impostazioni.
+// Popup: ON/OFF control, camera permission, settings.
 
 const DEFAULT_SETTINGS = {
   cursorGain: 1.6,
@@ -54,12 +54,12 @@ function reflectToggle() {
   els.toggleBtn.classList.toggle('running', running);
 }
 
-// --- Persistenza ------------------------------------------------------------
+// --- Persistence ------------------------------------------------------------
 async function loadState() {
   const data = await chrome.storage.local.get(['settings', 'running']);
   settings = { ...DEFAULT_SETTINGS, ...(data.settings || {}) };
   reflectSettings();
-  // Chiedi lo stato reale al background.
+  // Ask the background for the real state.
   chrome.runtime.sendMessage({ from: 'popup', type: 'GET_STATE' }, (res) => {
     if (chrome.runtime.lastError) return;
     running = !!(res && res.running);
@@ -90,16 +90,16 @@ function onSettingChange() {
   els[id].addEventListener('input', onSettingChange);
 });
 
-// --- Consenso fotocamera ----------------------------------------------------
-// Il prompt della fotocamera NON funziona dentro il popup (il popup si chiude
-// quando il prompt prende il focus). Apriamo quindi una pagina dedicata in una
-// scheda, dove il permesso può essere concesso correttamente.
+// --- Camera permission ------------------------------------------------------
+// The camera prompt does NOT work inside the popup (the popup closes when the
+// prompt takes focus). So we open a dedicated page in a tab, where the
+// permission can be granted correctly.
 els.cameraBtn.addEventListener('click', () => {
   chrome.tabs.create({ url: chrome.runtime.getURL('permission.html') });
   setStatus('Concedi il permesso nella scheda aperta, poi torna qui e premi Avvia.', 'load');
 });
 
-// --- Avvio / arresto --------------------------------------------------------
+// --- Start / stop -----------------------------------------------------------
 els.toggleBtn.addEventListener('click', () => {
   const type = running ? 'STOP' : 'START';
   setStatus(running ? 'Arresto…' : 'Avvio…', 'load');
@@ -118,7 +118,7 @@ els.toggleBtn.addEventListener('click', () => {
   });
 });
 
-// --- Messaggi di stato dal background/offscreen -----------------------------
+// --- Status messages from the background/offscreen --------------------------
 chrome.runtime.onMessage.addListener((msg) => {
   if (!msg || msg.from !== 'background' || msg.type !== 'STATUS') return;
   const p = msg.payload || {};
