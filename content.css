@@ -1,0 +1,103 @@
+/* ===========================================================================
+   Overlay on-page (cursore + badge) — stile HUD sci-fi "Iron Man" (DESIGN.md).
+   Accento blu (#3b82f6 / #58a6ff), glow con shadow 0 0 8px rgba(colore,0.8).
+   NB: font di sistema (il CSS gira nel contesto della pagina, con la sua CSP).
+   =========================================================================== */
+
+#handnav-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 18px;
+  height: 18px;
+  margin-left: -9px;
+  margin-top: -9px;
+  border-radius: 50%;
+  border: 2px solid rgba(59, 130, 246, 0.95);         /* blue-500 */
+  background: rgba(59, 130, 246, 0.15);
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.8), inset 0 0 5px rgba(88, 166, 255, 0.5);
+  pointer-events: none;
+  z-index: 2147483647;
+  transition: transform 0.05s linear, background 0.1s, border-color 0.1s, box-shadow 0.1s;
+  will-change: transform;
+  display: none;
+}
+
+/* Punto centrale per una mira precisa: il click parte esattamente da qui. */
+#handnav-cursor::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 3px;
+  height: 3px;
+  margin-left: -1.5px;
+  margin-top: -1.5px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 0 4px rgba(88, 166, 255, 0.9);
+}
+
+/* Pinch (click imminente): cerchio pieno e luminoso, rimpicciolito. */
+#handnav-cursor.handnav-pinch {
+  background: rgba(88, 166, 255, 0.5);
+  border-color: rgba(147, 197, 253, 0.98);            /* blue-300 */
+  box-shadow: 0 0 14px rgba(59, 130, 246, 0.95), inset 0 0 6px rgba(255, 255, 255, 0.6);
+  transform: scale(0.7);
+}
+
+/* Scroll: blu HUD più chiaro, glow più ampio per distinguerlo. */
+#handnav-cursor.handnav-scroll {
+  border-color: rgba(88, 166, 255, 0.98);             /* #58a6ff */
+  background: rgba(88, 166, 255, 0.18);
+  box-shadow: 0 0 14px rgba(88, 166, 255, 0.75);
+}
+
+/* Pulse del click sinistro (blu, accento attivo). */
+#handnav-cursor.handnav-click-pulse {
+  animation: handnav-pulse 0.35s ease-out;
+}
+@keyframes handnav-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7); }
+  100% { box-shadow: 0 0 0 26px rgba(59, 130, 246, 0); }
+}
+
+/* Pulse del tasto destro (indaco, dalla stessa famiglia blu→indigo dell'UI). */
+#handnav-cursor.handnav-rightclick-pulse {
+  animation: handnav-rightpulse 0.35s ease-out;
+}
+@keyframes handnav-rightpulse {
+  0%   { box-shadow: 0 0 0 0 rgba(129, 140, 248, 0.75); }  /* indigo-400 */
+  100% { box-shadow: 0 0 0 26px rgba(129, 140, 248, 0); }
+}
+
+/* Badge di stato: pillola di vetro con puntino luminoso. */
+#handnav-badge {
+  position: fixed;
+  bottom: 16px;
+  left: 16px;
+  display: none;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px 7px 12px;
+  border-radius: 999px;
+  font: 700 10px/1 ui-monospace, "SF Mono", "Segoe UI", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #e4e4e7;
+  background: rgba(9, 9, 11, 0.72);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
+  z-index: 2147483647;
+  pointer-events: none;
+}
+#handnav-badge::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #3b82f6;
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.8);
+}

@@ -1,0 +1,261 @@
+/* ===========================================================================
+   Design system "New Element / Iron Man" — HUD sci-fi (vedi DESIGN.md)
+   Fondo scuro, accento blu, pillole in vetro, testo mono maiuscolo, glow.
+   =========================================================================== */
+
+@font-face {
+  font-family: 'Play';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('vendor/fonts/play-400.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Play';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('vendor/fonts/play-700.woff2') format('woff2');
+}
+
+:root {
+  --bg: #09090b;            /* zinc-950 */
+  --text: #e4e4e7;          /* zinc-200 */
+  --muted: #a1a1aa;         /* zinc-400 */
+  --accent: #3b82f6;        /* blue-500 */
+  --accent-light: #60a5fa;  /* blue-400 */
+  --accent-hud: #58a6ff;    /* blu Iron Man */
+  --live: #ef4444;          /* red-500 */
+  --glass: rgba(0, 0, 0, 0.4);
+  --border: rgba(255, 255, 255, 0.1);
+  --font: 'Play', ui-monospace, 'Segoe UI', sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  width: 300px;
+  margin: 0;
+  padding: 16px 14px 14px;
+  font-family: var(--font);
+  color: var(--text);
+  background:
+    radial-gradient(120% 80% at 50% -10%, rgba(59, 130, 246, 0.15), transparent 60%),
+    var(--bg);
+  position: relative;
+}
+
+/* Linea HUD luminosa in cima */
+body::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent-hud), transparent);
+  opacity: 0.7;
+}
+
+/* --- Header ---------------------------------------------------------------- */
+header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.brand-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.8);
+}
+h1 {
+  font-size: 14px;
+  margin: 0;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+}
+.sub {
+  font-size: 9px;
+  color: var(--muted);
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+}
+
+/* --- Status (pillola di vetro) -------------------------------------------- */
+.status {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  text-align: center;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: var(--glass);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  margin-bottom: 12px;
+  min-height: 16px;
+  color: var(--muted);
+  transition: color 0.3s, border-color 0.3s, box-shadow 0.3s;
+}
+.status.ok {
+  color: var(--accent-light);
+  border-color: rgba(59, 130, 246, 0.4);
+  box-shadow: 0 0 14px rgba(59, 130, 246, 0.25);
+}
+.status.err {
+  color: #fca5a5;
+  border-color: rgba(239, 68, 68, 0.4);
+}
+.status.load {
+  color: #fcd34d;
+  border-color: rgba(234, 179, 8, 0.35);
+}
+
+/* --- Bottoni --------------------------------------------------------------- */
+.btn {
+  display: block;
+  width: 100%;
+  padding: 11px;
+  margin-bottom: 8px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-secondary {
+  background: var(--glass);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: var(--text);
+}
+.btn-secondary:hover {
+  border-color: rgba(255, 255, 255, 0.25);
+  background: rgba(0, 0, 0, 0.55);
+}
+.btn-secondary.granted {
+  color: var(--accent-light);
+  border-color: rgba(59, 130, 246, 0.4);
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.2);
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent), #4f46e5); /* blue-500 → indigo-600 */
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 0 16px rgba(59, 130, 246, 0.35);
+}
+.btn-primary:hover {
+  background: linear-gradient(135deg, var(--accent-light), #6366f1);
+}
+/* Stato "in esecuzione" = live → rosso pulsante (rosso riservato al live) */
+.btn-primary.running {
+  background: linear-gradient(135deg, #ef4444, #b91c1c);
+  box-shadow: 0 0 16px rgba(239, 68, 68, 0.4);
+  animation: handnav-live 2s ease-in-out infinite;
+}
+@keyframes handnav-live {
+  0%, 100% { box-shadow: 0 0 12px rgba(239, 68, 68, 0.3); }
+  50%      { box-shadow: 0 0 22px rgba(239, 68, 68, 0.6); }
+}
+
+/* --- Impostazioni ---------------------------------------------------------- */
+.settings { margin: 4px 0 12px; }
+summary {
+  cursor: pointer;
+  list-style: none;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--muted);
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--glass);
+  transition: color 0.2s, border-color 0.2s;
+}
+summary::-webkit-details-marker { display: none; }
+summary:hover {
+  color: var(--accent-light);
+  border-color: rgba(59, 130, 246, 0.35);
+}
+.settings[open] summary {
+  color: var(--accent-light);
+  margin-bottom: 6px;
+}
+.settings label {
+  display: block;
+  font-size: 9px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  margin: 12px 0 2px;
+}
+.settings label.checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+}
+.settings input[type="range"] {
+  width: 100%;
+  margin-top: 5px;
+  height: 4px;
+  accent-color: var(--accent);
+}
+.settings input[type="checkbox"] { accent-color: var(--accent); }
+.settings output {
+  float: right;
+  color: var(--accent-light);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- Legenda gesti (righe di vetro) --------------------------------------- */
+.legend {
+  margin-top: 4px;
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.legend div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 9px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 6px 10px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.legend span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 22px;
+  height: 22px;
+  font-size: 13px;
+  background: rgba(59, 130, 246, 0.12);
+  border-radius: 6px;
+}
